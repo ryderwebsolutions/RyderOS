@@ -297,6 +297,47 @@ export interface Database {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          id: string
+          organization_id: string
+          created_by: string
+          title: string
+          description: string | null
+          status: string
+          priority: string
+          due_date: string | null
+          linked_type: string | null
+          linked_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          created_by: string
+          title: string
+          description?: string | null
+          status?: string
+          priority?: string
+          due_date?: string | null
+          linked_type?: string | null
+          linked_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          title?: string
+          description?: string | null
+          status?: string
+          priority?: string
+          due_date?: string | null
+          linked_type?: string | null
+          linked_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       website_revisions: {
         Row: {
           id: string
@@ -401,6 +442,19 @@ export const DEFAULT_ASSET_CHECKLIST = [
   'Google account access granted',
   'Domain/hosting login details shared',
 ] as const
+
+export type Task = Database['public']['Tables']['tasks']['Row']
+export type TaskInsert = Database['public']['Tables']['tasks']['Insert']
+export type TaskUpdate = Database['public']['Tables']['tasks']['Update']
+
+export const TASK_STATUSES = ['open', 'in_progress', 'done'] as const
+export type TaskStatus = typeof TASK_STATUSES[number]
+
+export const TASK_PRIORITIES = ['low', 'medium', 'high'] as const
+export type TaskPriority = typeof TASK_PRIORITIES[number]
+
+export const TASK_LINKED_TYPES = ['contact', 'client', 'website'] as const
+export type TaskLinkedType = typeof TASK_LINKED_TYPES[number]
 
 export const DEFAULT_ONBOARDING_CHECKLIST = [
   'Discovery call completed',
