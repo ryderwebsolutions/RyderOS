@@ -1,6 +1,5 @@
 'use client'
 
-import { useRef } from 'react'
 import { useFormStatus } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,10 +30,8 @@ interface ContactFormProps {
 }
 
 export function ContactForm({ action, contact, submitLabel }: ContactFormProps) {
-  const formRef = useRef<HTMLFormElement>(null)
-
   return (
-    <form ref={formRef} action={action} className="space-y-5">
+    <form action={action} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="first_name">First name <span className="text-destructive">*</span></Label>
@@ -57,9 +54,15 @@ export function ContactForm({ action, contact, submitLabel }: ContactFormProps) 
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="company_name">Company</Label>
-        <Input id="company_name" name="company_name" defaultValue={contact?.company_name ?? ''} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="company_name">Company</Label>
+          <Input id="company_name" name="company_name" defaultValue={contact?.company_name ?? ''} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="website_url">Website</Label>
+          <Input id="website_url" name="website_url" type="url" placeholder="https://" defaultValue={contact?.website_url ?? ''} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -96,8 +99,8 @@ export function ContactForm({ action, contact, submitLabel }: ContactFormProps) 
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="notes">Notes</Label>
-        <Textarea id="notes" name="notes" rows={4} defaultValue={contact?.notes ?? ''} />
+        <Label htmlFor="notes">Internal notes</Label>
+        <Textarea id="notes" name="notes" rows={3} defaultValue={contact?.notes ?? ''} placeholder="Quick notes about this contact…" />
       </div>
 
       <div className="flex gap-3">
