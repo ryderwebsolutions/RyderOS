@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard', href: '/dashboard', icon: '⬛' },
   { label: 'CRM', href: '/crm', icon: '👥' },
   { label: 'Clients', href: '/clients', icon: '🏢' },
+  { label: 'Websites', href: '/websites', icon: '🌐' },
   { label: 'Leads', href: '/leads', icon: '⚡' },
   { label: 'Tasks', href: '/tasks', icon: '✓' },
   { label: 'Settings', href: '/settings', icon: '⚙' },

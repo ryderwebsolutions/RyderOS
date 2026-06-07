@@ -224,6 +224,108 @@ export interface Database {
         }
         Relationships: []
       }
+      websites: {
+        Row: {
+          id: string
+          organization_id: string
+          client_id: string | null
+          name: string
+          domain: string | null
+          hosting_provider: string | null
+          email_provider: string | null
+          status: string
+          launch_date: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          client_id?: string | null
+          name: string
+          domain?: string | null
+          hosting_provider?: string | null
+          email_provider?: string | null
+          status?: string
+          launch_date?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          name?: string
+          domain?: string | null
+          hosting_provider?: string | null
+          email_provider?: string | null
+          status?: string
+          launch_date?: string | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      website_checklist_items: {
+        Row: {
+          id: string
+          organization_id: string
+          website_id: string
+          category: string
+          label: string
+          completed: boolean
+          completed_at: string | null
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          website_id: string
+          category?: string
+          label: string
+          completed?: boolean
+          completed_at?: string | null
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          label?: string
+          completed?: boolean
+          completed_at?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      website_revisions: {
+        Row: {
+          id: string
+          organization_id: string
+          website_id: string
+          description: string
+          status: string
+          priority: string
+          created_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          website_id: string
+          description: string
+          status?: string
+          priority?: string
+          created_at?: string
+          completed_at?: string | null
+        }
+        Update: {
+          description?: string
+          status?: string
+          priority?: string
+          completed_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -256,6 +358,49 @@ export const SERVICE_TYPES = ['Web Design', 'SEO', 'Social Media', 'Web Design +
 export const GBP_STATUSES = ['not_started', 'claimed', 'optimized'] as const
 export const PAYMENT_STATUSES = ['current', 'overdue', 'paused', 'cancelled'] as const
 export const RETAINER_STATUSES = ['active', 'inactive', 'paused'] as const
+
+export type Website = Database['public']['Tables']['websites']['Row']
+export type WebsiteInsert = Database['public']['Tables']['websites']['Insert']
+export type WebsiteUpdate = Database['public']['Tables']['websites']['Update']
+export type WebsiteChecklistItem = Database['public']['Tables']['website_checklist_items']['Row']
+export type WebsiteRevision = Database['public']['Tables']['website_revisions']['Row']
+
+export const WEBSITE_STATUSES = ['not_started', 'in_progress', 'review', 'live', 'maintenance'] as const
+export type WebsiteStatus = typeof WEBSITE_STATUSES[number]
+
+export const HOSTING_PROVIDERS = ['SiteGround', 'Cloudflare Pages', 'Vercel', 'WP Engine', 'Kinsta', 'GoDaddy', 'Other'] as const
+export const EMAIL_PROVIDERS = ['Google Workspace', 'Microsoft 365', 'Zoho Mail', 'GoDaddy Email', 'Other'] as const
+export const REVISION_STATUSES = ['requested', 'in_progress', 'completed'] as const
+export const REVISION_PRIORITIES = ['low', 'medium', 'high'] as const
+
+export const DEFAULT_LAUNCH_CHECKLIST = [
+  'Domain purchased & registered',
+  'Domain pointed to hosting',
+  'Hosting account configured',
+  'SSL certificate active',
+  'DNS records correct',
+  'Business email setup complete',
+  'Website design completed',
+  'All content added',
+  'Contact form tested & working',
+  'Google Analytics connected',
+  'Google Search Console verified',
+  'Google Business Profile linked',
+  'Client review & approval received',
+  'Website launched',
+] as const
+
+export const DEFAULT_ASSET_CHECKLIST = [
+  'Logo files received (PNG + SVG)',
+  'Brand colours & fonts provided',
+  'Business description written',
+  'Photos & images received',
+  'Service/product descriptions provided',
+  'Testimonials received',
+  'Social media links provided',
+  'Google account access granted',
+  'Domain/hosting login details shared',
+] as const
 
 export const DEFAULT_ONBOARDING_CHECKLIST = [
   'Discovery call completed',
