@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { updateWebsite } from '@/actions/websites'
+import { createWebsite, updateWebsite } from '@/actions/websites'
 import { WebsiteForm } from '@/components/websites/website-form'
 import { WebsiteChecklist } from '@/components/websites/website-checklist'
 import { RevisionTracker } from '@/components/websites/revision-tracker'
@@ -29,6 +29,31 @@ export default async function WebsiteDetailPage({ params }: Props) {
 
   if (!member) redirect('/login')
 
+  // ── Create new ──────────────────────────────────────────────────────────
+  if (id === 'new') {
+    const { data: clients } = await supabase
+      .from('clients')
+      .select('id, name')
+      .eq('organization_id', member.organization_id)
+      .eq('status', 'active')
+      .order('name')
+
+    return (
+      <div className="max-w-2xl space-y-6">
+        <div>
+          <Link href="/websites" className="text-sm text-muted-foreground hover:text-foreground">
+            ← Websites
+          </Link>
+          <h1 className="mt-2 text-2xl font-semibold">Add website</h1>
+        </div>
+        <div className="rounded-xl border border-border p-6">
+          <WebsiteForm action={createWebsite} clients={clients ?? []} submitLabel="Create website" />
+        </div>
+      </div>
+    )
+  }
+
+  // ── Edit existing ────────────────────────────────────────────────────────
   const [websiteResult, checklistResult, revisionsResult, clientsResult] = await Promise.all([
     supabase.from('websites').select('*').eq('id', id).eq('organization_id', member.organization_id).single(),
     supabase.from('website_checklist_items').select('*').eq('website_id', id).order('sort_order'),
@@ -50,7 +75,6 @@ export default async function WebsiteDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <Link href="/websites" className="text-sm text-muted-foreground hover:text-foreground">
           ← Websites
@@ -71,9 +95,7 @@ export default async function WebsiteDetailPage({ params }: Props) {
         )}
       </div>
 
-      {/* Main layout */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left: Edit form */}
         <div className="lg:col-span-1 space-y-6">
           <div className="rounded-xl border border-border p-5">
             <h2 className="text-sm font-semibold mb-4">Details</h2>
@@ -81,7 +103,6 @@ export default async function WebsiteDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Middle: Checklists */}
         <div className="lg:col-span-1 space-y-6">
           <div className="rounded-xl border border-border p-5">
             <h2 className="text-sm font-semibold mb-4">Assets checklist</h2>
@@ -101,7 +122,6 @@ export default async function WebsiteDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Right: Revision tracker */}
         <div className="lg:col-span-1">
           <div className="rounded-xl border border-border p-5">
             <h2 className="text-sm font-semibold mb-4">Revisions</h2>

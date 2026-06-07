@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { updateLead, moveLeadStage, markLeadLost, deleteLead } from '@/actions/leads'
+import { createLead, updateLead, moveLeadStage, markLeadLost, deleteLead } from '@/actions/leads'
 import { LeadForm } from '@/components/leads/lead-form'
 import { LeadStageBadge } from '@/components/leads/lead-stage-badge'
 
@@ -29,6 +29,36 @@ export default async function LeadDetailPage({ params }: Props) {
 
   if (!member) redirect('/login')
 
+  // ── Create new ──────────────────────────────────────────────────────────
+  if (id === 'new') {
+    const { data: rawContacts } = await supabase
+      .from('contacts')
+      .select('id, first_name, last_name')
+      .eq('organization_id', member.organization_id)
+      .is('archived_at', null)
+      .order('first_name')
+
+    const contacts = (rawContacts ?? []).map((c) => ({
+      id: c.id,
+      name: [c.first_name, c.last_name].filter(Boolean).join(' '),
+    }))
+
+    return (
+      <div className="max-w-2xl space-y-6">
+        <div>
+          <Link href="/leads" className="text-sm text-muted-foreground hover:text-foreground">
+            ← Leads
+          </Link>
+          <h1 className="mt-2 text-2xl font-semibold">Add lead</h1>
+        </div>
+        <div className="rounded-xl border border-border p-6">
+          <LeadForm action={createLead} contacts={contacts} submitLabel="Create lead" />
+        </div>
+      </div>
+    )
+  }
+
+  // ── Edit existing ────────────────────────────────────────────────────────
   const [leadResult, contactsResult] = await Promise.all([
     supabase.from('leads').select('*').eq('id', id).eq('organization_id', member.organization_id).single(),
     supabase.from('contacts').select('id, first_name, last_name').eq('organization_id', member.organization_id).is('archived_at', null).order('first_name'),
@@ -56,7 +86,6 @@ export default async function LeadDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-2xl space-y-6">
-      {/* Header */}
       <div>
         <Link href="/leads" className="text-sm text-muted-foreground hover:text-foreground">
           ← Leads
@@ -70,7 +99,6 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Stage progress — only for active leads */}
       {isActive && (
         <div className="rounded-xl border border-border p-5 space-y-3">
           <h2 className="text-sm font-semibold">Stage</h2>
@@ -95,8 +123,6 @@ export default async function LeadDetailPage({ params }: Props) {
               )
             })}
           </div>
-
-          {/* Won / Lost actions */}
           <div className="flex items-center gap-3 pt-1">
             <form action={moveLeadStage.bind(null, id, 'won')}>
               <button type="submit" className="text-sm font-medium text-green-700 hover:underline">
@@ -113,7 +139,6 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Reopen if closed */}
       {!isActive && (
         <div className="rounded-xl border border-border p-5">
           <p className="text-sm text-muted-foreground mb-3">
@@ -127,18 +152,11 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Edit form */}
       <div className="rounded-xl border border-border p-6">
         <h2 className="text-sm font-semibold mb-4">Details</h2>
-        <LeadForm
-          action={handleUpdate}
-          lead={lead}
-          contacts={contacts}
-          submitLabel="Save changes"
-        />
+        <LeadForm action={handleUpdate} lead={lead} contacts={contacts} submitLabel="Save changes" />
       </div>
 
-      {/* Delete */}
       <div className="rounded-xl border border-destructive/20 p-5">
         <p className="text-sm font-medium text-destructive mb-3">Danger zone</p>
         <form action={handleDelete}>
