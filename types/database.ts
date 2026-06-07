@@ -297,6 +297,57 @@ export interface Database {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          id: string
+          organization_id: string
+          contact_id: string | null
+          name: string
+          email: string | null
+          phone: string | null
+          source: string | null
+          stage: string
+          value: number | null
+          notes: string | null
+          won_at: string | null
+          lost_at: string | null
+          lost_reason: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          contact_id?: string | null
+          name: string
+          email?: string | null
+          phone?: string | null
+          source?: string | null
+          stage?: string
+          value?: number | null
+          notes?: string | null
+          won_at?: string | null
+          lost_at?: string | null
+          lost_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_id?: string | null
+          name?: string
+          email?: string | null
+          phone?: string | null
+          source?: string | null
+          stage?: string
+          value?: number | null
+          notes?: string | null
+          won_at?: string | null
+          lost_at?: string | null
+          lost_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           id: string
@@ -442,6 +493,15 @@ export const DEFAULT_ASSET_CHECKLIST = [
   'Google account access granted',
   'Domain/hosting login details shared',
 ] as const
+
+export type Lead = Database['public']['Tables']['leads']['Row']
+export type LeadInsert = Database['public']['Tables']['leads']['Insert']
+export type LeadUpdate = Database['public']['Tables']['leads']['Update']
+
+export const LEAD_STAGES = ['new', 'contacted', 'qualified', 'quoted', 'won', 'lost'] as const
+export type LeadStage = typeof LEAD_STAGES[number]
+
+export const LEAD_PIPELINE_STAGES = ['new', 'contacted', 'qualified', 'quoted'] as const
 
 export type Task = Database['public']['Tables']['tasks']['Row']
 export type TaskInsert = Database['public']['Tables']['tasks']['Insert']
