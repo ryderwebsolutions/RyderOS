@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: 'Websites', href: '/websites', icon: '🌐' },
   { label: 'Leads', href: '/leads', icon: '⚡' },
   { label: 'Tasks', href: '/tasks', icon: '✓' },
+  { label: 'Submissions', href: '/submissions', icon: '📥' },
   { label: 'Settings', href: '/settings', icon: '⚙' },
 ]
 

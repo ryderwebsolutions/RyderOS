@@ -14,6 +14,7 @@ export interface Database {
           id: string
           name: string
           slug: string
+          form_token: string
           created_at: string
           updated_at: string
         }
@@ -21,6 +22,7 @@ export interface Database {
           id?: string
           name: string
           slug: string
+          form_token?: string
           created_at?: string
           updated_at?: string
         }
@@ -28,6 +30,7 @@ export interface Database {
           id?: string
           name?: string
           slug?: string
+          form_token?: string
           updated_at?: string
         }
         Relationships: []
@@ -297,6 +300,40 @@ export interface Database {
         }
         Relationships: []
       }
+      form_submissions: {
+        Row: {
+          id: string
+          organization_id: string
+          website_id: string | null
+          name: string
+          email: string | null
+          phone: string | null
+          message: string | null
+          source_url: string | null
+          status: string
+          converted_to_lead_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          website_id?: string | null
+          name: string
+          email?: string | null
+          phone?: string | null
+          message?: string | null
+          source_url?: string | null
+          status?: string
+          converted_to_lead_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          website_id?: string | null
+          status?: string
+          converted_to_lead_id?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           id: string
@@ -493,6 +530,11 @@ export const DEFAULT_ASSET_CHECKLIST = [
   'Google account access granted',
   'Domain/hosting login details shared',
 ] as const
+
+export type FormSubmission = Database['public']['Tables']['form_submissions']['Row']
+
+export const SUBMISSION_STATUSES = ['new', 'reviewed', 'converted'] as const
+export type SubmissionStatus = typeof SUBMISSION_STATUSES[number]
 
 export type Lead = Database['public']['Tables']['leads']['Row']
 export type LeadInsert = Database['public']['Tables']['leads']['Insert']
