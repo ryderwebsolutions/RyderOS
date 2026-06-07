@@ -2,11 +2,11 @@
 
 ## Current Layer
 
-Layer 3 — Client Management (complete)
+Layer 4 — Website Management (complete)
 
 ## Current Milestone
 
-Layer 3 complete. Ready for Layer 4 — Website Management.
+Layer 4 complete. Ready for Layer 5 — Tasks.
 
 ---
 
@@ -46,13 +46,17 @@ Layer 3 complete. Ready for Layer 4 — Website Management.
 
 ### Layer 4 — Website Management
 
-* [ ] Websites Table
-* [ ] Website Projects
-* [ ] Website Status Tracking
-* [ ] Launch Checklist
-* [ ] Revision Tracking
-* [ ] Asset Tracking
-* [ ] Maintenance Tracking
+* [x] Websites Table (id, org_id, client_id, name, domain, hosting_provider, email_provider, status, launch_date, notes)
+* [x] Website Checklist Items (category: launch / assets, completed, sort_order)
+* [x] Website Revisions (description, status, priority, completed_at)
+* [x] Website List Page `/websites` — table with status badges, domain links, client link
+* [x] New Website Page `/websites/new` — form with auto-seeded checklists on creation
+* [x] Website Detail Page `/websites/[id]` — 3-column: details form / checklists / revisions
+* [x] Status Tracking (not_started → in_progress → review → live → maintenance)
+* [x] Launch Checklist (14 default items: domain, hosting, SSL, DNS, email, GA, GSC, GBP, launch)
+* [x] Asset Checklist (9 default items: logo, brand, content, photos, socials, access)
+* [x] Revision Tracker (add revisions, set priority low/medium/high, update status, delete, collapse completed)
+* [x] Websites added to sidebar navigation
 
 ### Layer 5 — Tasks
 
@@ -226,6 +230,47 @@ Layer 3 complete. Ready for Layer 4 — Website Management.
 | sort_order | INTEGER | display order |
 | created_at | TIMESTAMPTZ | |
 
+### `websites`
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID PK | |
+| organization_id | UUID FK | → organizations |
+| client_id | UUID FK | → clients (nullable) |
+| name | TEXT | project name |
+| domain | TEXT | nullable |
+| hosting_provider | TEXT | nullable |
+| email_provider | TEXT | nullable |
+| status | TEXT | not_started / in_progress / review / live / maintenance |
+| launch_date | DATE | nullable |
+| notes | TEXT | nullable |
+| created_at | TIMESTAMPTZ | |
+| updated_at | TIMESTAMPTZ | auto-updated |
+
+### `website_checklist_items`
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID PK | |
+| organization_id | UUID FK | → organizations |
+| website_id | UUID FK | → websites |
+| category | TEXT | launch / assets |
+| label | TEXT | checklist item text |
+| completed | BOOLEAN | default false |
+| completed_at | TIMESTAMPTZ | nullable |
+| sort_order | INTEGER | display order |
+| created_at | TIMESTAMPTZ | |
+
+### `website_revisions`
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID PK | |
+| organization_id | UUID FK | → organizations |
+| website_id | UUID FK | → websites |
+| description | TEXT | required |
+| status | TEXT | requested / in_progress / completed |
+| priority | TEXT | low / medium / high |
+| created_at | TIMESTAMPTZ | |
+| completed_at | TIMESTAMPTZ | nullable |
+
 ---
 
 ## Technical Debt
@@ -240,21 +285,6 @@ Layer 3 complete. Ready for Layer 4 — Website Management.
 
 ---
 
-## Next Recommended Milestone
-
-**Layer 4 — Website Management**
-
-Build order:
-1. `websites` table (migration 005)
-2. Website project list page `/websites`
-3. Website detail page `/websites/[id]`
-4. Status tracker (Not started → In progress → Review → Live)
-5. Launch checklist (domain, hosting, DNS, email, Google setup)
-6. Revision tracker
-7. Asset checklist
-
----
-
 ## Notes
 
 ### Architecture Decisions
@@ -266,10 +296,13 @@ Build order:
 - **Trigger functions need `SET search_path = public`** — required for Supabase triggers on `auth.users`.
 - **Soft delete pattern** — `archived_at TIMESTAMPTZ` column, null = active, set = archived. No hard deletes on contacts.
 - **Default onboarding checklist** — 10 standard items inserted automatically when a client is created.
+- **Default website checklists** — 14 launch items + 9 asset items inserted automatically when a website is created.
+- **Base UI Select `onValueChange`** — passes `string | null`, not `string`. Always guard with `val && handler(val)`.
 
 ### Deployment
 - **Repo:** github.com/ryderwebsolutions/RyderOS
 - **Hosting:** Vercel (auto-deploys on push to main)
 - **Domain:** ryderos.com
 - **Database:** Supabase (project: yumxrlnpdjrnynqdwmli)
-- **Migrations run:** 001_initial_schema, 002_contacts, 003_contacts_v2 (pending), 004_clients (pending)
+- **Migrations run:** 001_initial_schema, 002_contacts, 003_contacts_v2, 004_clients
+- **Migration pending (not yet run):** 005_websites — run this in Supabase SQL Editor before using /websites
