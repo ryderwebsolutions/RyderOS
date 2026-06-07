@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createTask, updateTask, deleteTask } from '@/actions/tasks'
 import { TaskForm } from '@/components/tasks/task-form'
 import { TaskStatusBadge, TaskPriorityBadge } from '@/components/tasks/task-badges'
+import { DeleteButton } from '@/components/shared/delete-button'
 
 export const metadata = { title: 'Task — RyderOS' }
 
@@ -114,13 +115,7 @@ export default async function TaskDetailPage({ params }: Props) {
       <div className="rounded-xl border border-destructive/20 p-5">
         <p className="text-sm font-medium text-destructive mb-3">Danger zone</p>
         <form action={handleDelete}>
-          <button
-            type="submit"
-            className="text-sm text-destructive hover:underline"
-            onClick={(e) => { if (!confirm('Delete this task?')) e.preventDefault() }}
-          >
-            Delete task
-          </button>
+          <DeleteButton label="Delete task" confirm="Delete this task?" />
         </form>
       </div>
     </div>

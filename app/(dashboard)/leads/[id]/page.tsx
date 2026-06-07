@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createLead, updateLead, moveLeadStage, markLeadLost, deleteLead } from '@/actions/leads'
 import { LeadForm } from '@/components/leads/lead-form'
 import { LeadStageBadge } from '@/components/leads/lead-stage-badge'
+import { DeleteButton } from '@/components/shared/delete-button'
 
 export const metadata = { title: 'Lead — RyderOS' }
 
@@ -160,13 +161,7 @@ export default async function LeadDetailPage({ params }: Props) {
       <div className="rounded-xl border border-destructive/20 p-5">
         <p className="text-sm font-medium text-destructive mb-3">Danger zone</p>
         <form action={handleDelete}>
-          <button
-            type="submit"
-            className="text-sm text-destructive hover:underline"
-            onClick={(e) => { if (!confirm('Delete this lead?')) e.preventDefault() }}
-          >
-            Delete lead
-          </button>
+          <DeleteButton label="Delete lead" confirm="Delete this lead?" />
         </form>
       </div>
     </div>
