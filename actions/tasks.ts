@@ -4,6 +4,11 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+function sel(val: FormDataEntryValue | null): string | null {
+  const s = (val as string) || ''
+  return s && s !== 'none' ? s : null
+}
+
 async function getOrgAndUser() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -23,17 +28,17 @@ async function getOrgAndUser() {
 export async function createTask(formData: FormData) {
   const { organization_id, user_id, supabase } = await getOrgAndUser()
 
-  const linked_type = (formData.get('linked_type') as string) || null
-  const linked_id = (formData.get('linked_id') as string) || null
+  const linked_type = sel(formData.get('linked_type'))
+  const linked_id = sel(formData.get('linked_id'))
 
   const { error } = await supabase.from('tasks').insert({
     organization_id,
     created_by: user_id,
     title: formData.get('title') as string,
-    description: (formData.get('description') as string) || null,
-    status: (formData.get('status') as string) || 'open',
-    priority: (formData.get('priority') as string) || 'medium',
-    due_date: (formData.get('due_date') as string) || null,
+    description: sel(formData.get('description')),
+    status: sel(formData.get('status')) ?? 'open',
+    priority: sel(formData.get('priority')) ?? 'medium',
+    due_date: sel(formData.get('due_date')),
     linked_type: linked_type && linked_id ? linked_type : null,
     linked_id: linked_type && linked_id ? linked_id : null,
   })
@@ -47,17 +52,17 @@ export async function createTask(formData: FormData) {
 export async function updateTask(id: string, formData: FormData) {
   const { supabase } = await getOrgAndUser()
 
-  const linked_type = (formData.get('linked_type') as string) || null
-  const linked_id = (formData.get('linked_id') as string) || null
+  const linked_type = sel(formData.get('linked_type'))
+  const linked_id = sel(formData.get('linked_id'))
 
   const { error } = await supabase
     .from('tasks')
     .update({
       title: formData.get('title') as string,
-      description: (formData.get('description') as string) || null,
-      status: (formData.get('status') as string) || 'open',
-      priority: (formData.get('priority') as string) || 'medium',
-      due_date: (formData.get('due_date') as string) || null,
+      description: sel(formData.get('description')),
+      status: sel(formData.get('status')) ?? 'open',
+      priority: sel(formData.get('priority')) ?? 'medium',
+      due_date: sel(formData.get('due_date')),
       linked_type: linked_type && linked_id ? linked_type : null,
       linked_id: linked_type && linked_id ? linked_id : null,
     })

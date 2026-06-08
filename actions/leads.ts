@@ -4,6 +4,12 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+// Converts empty strings and Select placeholder 'none' to null
+function sel(val: FormDataEntryValue | null): string | null {
+  const s = (val as string) || ''
+  return s && s !== 'none' ? s : null
+}
+
 async function getOrgId() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -27,14 +33,14 @@ export async function createLead(formData: FormData) {
     .from('leads')
     .insert({
       organization_id,
-      contact_id: (formData.get('contact_id') as string) || null,
+      contact_id: sel(formData.get('contact_id')),
       name: formData.get('name') as string,
-      email: (formData.get('email') as string) || null,
-      phone: (formData.get('phone') as string) || null,
-      source: (formData.get('source') as string) || null,
+      email: sel(formData.get('email')),
+      phone: sel(formData.get('phone')),
+      source: sel(formData.get('source')),
       stage: 'new',
       value: formData.get('value') ? Number(formData.get('value')) : null,
-      notes: (formData.get('notes') as string) || null,
+      notes: sel(formData.get('notes')),
     })
     .select()
     .single()
@@ -51,13 +57,13 @@ export async function updateLead(id: string, formData: FormData) {
   const { error } = await supabase
     .from('leads')
     .update({
-      contact_id: (formData.get('contact_id') as string) || null,
+      contact_id: sel(formData.get('contact_id')),
       name: formData.get('name') as string,
-      email: (formData.get('email') as string) || null,
-      phone: (formData.get('phone') as string) || null,
-      source: (formData.get('source') as string) || null,
+      email: sel(formData.get('email')),
+      phone: sel(formData.get('phone')),
+      source: sel(formData.get('source')),
       value: formData.get('value') ? Number(formData.get('value')) : null,
-      notes: (formData.get('notes') as string) || null,
+      notes: sel(formData.get('notes')),
     })
     .eq('id', id)
 

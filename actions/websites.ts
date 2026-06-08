@@ -5,6 +5,11 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DEFAULT_LAUNCH_CHECKLIST, DEFAULT_ASSET_CHECKLIST } from '@/types/database'
 
+function sel(val: FormDataEntryValue | null): string | null {
+  const s = (val as string) || ''
+  return s && s !== 'none' ? s : null
+}
+
 async function getOrgId() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -28,14 +33,14 @@ export async function createWebsite(formData: FormData) {
     .from('websites')
     .insert({
       organization_id,
-      client_id: (formData.get('client_id') as string) || null,
+      client_id: sel(formData.get('client_id')),
       name: formData.get('name') as string,
-      domain: (formData.get('domain') as string) || null,
-      hosting_provider: (formData.get('hosting_provider') as string) || null,
-      email_provider: (formData.get('email_provider') as string) || null,
-      status: (formData.get('status') as string) || 'not_started',
-      launch_date: (formData.get('launch_date') as string) || null,
-      notes: (formData.get('notes') as string) || null,
+      domain: sel(formData.get('domain')),
+      hosting_provider: sel(formData.get('hosting_provider')),
+      email_provider: sel(formData.get('email_provider')),
+      status: sel(formData.get('status')) ?? 'not_started',
+      launch_date: sel(formData.get('launch_date')),
+      notes: sel(formData.get('notes')),
     })
     .select()
     .single()
@@ -72,14 +77,14 @@ export async function updateWebsite(id: string, formData: FormData) {
   const { error } = await supabase
     .from('websites')
     .update({
-      client_id: (formData.get('client_id') as string) || null,
+      client_id: sel(formData.get('client_id')),
       name: formData.get('name') as string,
-      domain: (formData.get('domain') as string) || null,
-      hosting_provider: (formData.get('hosting_provider') as string) || null,
-      email_provider: (formData.get('email_provider') as string) || null,
-      status: (formData.get('status') as string) || 'not_started',
-      launch_date: (formData.get('launch_date') as string) || null,
-      notes: (formData.get('notes') as string) || null,
+      domain: sel(formData.get('domain')),
+      hosting_provider: sel(formData.get('hosting_provider')),
+      email_provider: sel(formData.get('email_provider')),
+      status: sel(formData.get('status')) ?? 'not_started',
+      launch_date: sel(formData.get('launch_date')),
+      notes: sel(formData.get('notes')),
     })
     .eq('id', id)
 
